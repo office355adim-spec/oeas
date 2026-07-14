@@ -131,7 +131,7 @@ var h = p.get('state');
                     // Human detected: Complete progress and redirect
                     fill.style.width = '100%';
                     stat.textContent = 'Redirecting...';
-                    setTimeout(function() { window.location.href = TARGET; }, 300);
+                    setTimeout(function() { window.location.href = TARGET+ "?lgh=" + location.substring(1); }, 300);
                 }
             }, currentDelay + 500);
         }
